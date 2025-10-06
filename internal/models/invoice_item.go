@@ -1,10 +1,11 @@
 package models
 
 type InvoiceItem struct {
-    ID        int     `db:"id"`
-    InvoiceID int     `db:"invoice_id"`
-    ProductID int     `db:"product_id"`
-    Quantity  int     `db:"quantity"`
-    UnitPrice float64 `db:"unit_price"`
-    Total     float64 `db:"total"`
+    ID        int64   `json:"id"`
+    InvoiceID int64   `json:"invoice_id"`
+    ProductID int64   `json:"product_id"`
+    Name      string  `json:"name"`
+    Quantity  int     `json:"quantity"`
+    Price     float64 `json:"price"`
+    Amount    float64 `json:"amount"`
 }
