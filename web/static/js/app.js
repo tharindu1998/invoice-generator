@@ -80,15 +80,14 @@ function lookupCustomer(phone) {
         .then(r => r.ok ? r.json() : null)
         .then(data => {
             if (!data) return;
-            const nameEl    = document.getElementById('customer_name');
-            const emailEl   = document.getElementById('customer_email');
-            const addressEl = document.getElementById('customer_address');
-            if (nameEl    && !nameEl.value)    nameEl.value    = data.name  || '';
-            if (emailEl   && !emailEl.value)   emailEl.value   = data.email || '';
-            if (addressEl && !addressEl.value) {
-                const parts = [data.address_line1, data.address_line2].filter(Boolean);
-                addressEl.value = parts.join(', ');
-            }
+            const nameEl  = document.getElementById('customer_name');
+            const emailEl = document.getElementById('customer_email');
+            const addr1El = document.getElementById('customer_address_line1');
+            const addr2El = document.getElementById('customer_address_line2');
+            if (nameEl  && !nameEl.value)  nameEl.value  = data.name  || '';
+            if (emailEl && !emailEl.value) emailEl.value = data.email || '';
+            if (addr1El && !addr1El.value) addr1El.value = data.address_line1 || '';
+            if (addr2El && !addr2El.value) addr2El.value = data.address_line2 || '';
         })
         .catch(() => {});
 }
@@ -158,7 +157,7 @@ function previewInvoice() {
         rows += `<tr>
             <td>${names[i]}</td>
             <td style="text-align:center">${qtys[i]}</td>
-            <td style="text-align:right">${parseFloat(prices[i]).toFixed(2)}</td>
+            <td style="text-align:right">${(parseFloat(prices[i]) || 0).toFixed(2)}</td>
             <td style="text-align:right">${amt.toFixed(2)}</td>
         </tr>`;
     }
@@ -179,10 +178,32 @@ function previewInvoice() {
             ${notes ? `<p style="margin-top:0.75rem;color:#6b7280">Notes: ${notes}</p>` : ''}
         </div>` : '';
 
+    const sellerName    = fd.get('seller_name')    || '';
+    const sellerPhone   = fd.get('seller_phone')   || '';
+    const sellerAddress = fd.get('seller_address') || '';
+    const custAddr1     = fd.get('customer_address_line1') || '';
+    const custAddr2     = fd.get('customer_address_line2') || '';
+
+    const partiesSection = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1rem;padding:1rem;background:#f9fafb;border-radius:8px;font-size:0.875rem">
+            <div>
+                <p style="font-size:0.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">From</p>
+                <p style="font-weight:600">${sellerName || '—'}</p>
+                ${sellerPhone   ? `<p style="color:#6b7280">${sellerPhone}</p>`   : ''}
+                ${sellerAddress ? `<p style="color:#6b7280">${sellerAddress}</p>` : ''}
+            </div>
+            <div>
+                <p style="font-size:0.7rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.4rem">Bill To</p>
+                <p style="font-weight:600">${fd.get('customer_name') || '—'}</p>
+                ${fd.get('customer_mobile') ? `<p style="color:#6b7280">${fd.get('customer_mobile')}</p>` : ''}
+                ${custAddr1 ? `<p style="color:#6b7280">${custAddr1}</p>` : ''}
+                ${custAddr2 ? `<p style="color:#6b7280">${custAddr2}</p>` : ''}
+            </div>
+        </div>`;
+
     document.getElementById('previewContent').innerHTML = `
-        <p><strong>Customer:</strong> ${fd.get('customer_name') || '—'}</p>
-        <p><strong>Mobile:</strong> ${fd.get('customer_mobile') || '—'}</p>
-        <p style="margin-top:0.5rem"><strong>Date:</strong> ${fd.get('date')} &nbsp;|&nbsp; <strong>Due:</strong> ${fd.get('due_date')}</p>
+        ${partiesSection}
+        <p style="margin-bottom:0.75rem;font-size:0.875rem"><strong>Date:</strong> ${fd.get('date')} &nbsp;|&nbsp; <strong>Due:</strong> ${fd.get('due_date')}</p>
         <table style="width:100%;border-collapse:collapse;margin:1.25rem 0;font-size:0.875rem">
             <thead>
                 <tr style="background:#f9fafb;border-bottom:2px solid #e5e7eb">

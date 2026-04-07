@@ -8,8 +8,10 @@ type Invoice struct {
 	CustomerMobile  string        `db:"customer_mobile"  json:"customer_mobile"`
 	CustomerName    string        `db:"customer_name"    json:"customer_name"`
 	CustomerEmail   string        `db:"customer_email"   json:"customer_email"`
-	CustomerAddress string        `db:"customer_address" json:"customer_address"`
+	CustomerAddressLine1 string        `db:"customer_address_line1" json:"customer_address_line1"`
+	CustomerAddressLine2 string        `db:"customer_address_line2" json:"customer_address_line2"`
 	SellerName      string        `db:"seller_name"      json:"seller_name"`
+	SellerPhone     string        `db:"seller_phone"     json:"seller_phone"`
 	SellerAddress   string        `db:"seller_address"   json:"seller_address"`
 	Date            time.Time     `db:"date"             json:"date"`
 	PaymentDue      time.Time     `db:"payment_due"      json:"payment_due"`

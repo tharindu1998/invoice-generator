@@ -26,20 +26,21 @@
 
     <!-- Addresses -->
     <div class="form-section">
+        <p class="section-title">Parties</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
-            {{ if or $inv.SellerName $inv.SellerAddress }}
             <div>
-                <p class="section-title">From</p>
-                {{ if $inv.SellerName }}<p style="font-weight:600">{{ $inv.SellerName }}</p>{{ end }}
+                <p style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:0.5rem">From</p>
+                {{ if $inv.SellerName }}<p style="font-weight:600">{{ $inv.SellerName }}</p>{{ else }}<p style="color:var(--text-muted)">—</p>{{ end }}
+                {{ if $inv.SellerPhone }}<p style="color:var(--text-muted)">{{ $inv.SellerPhone }}</p>{{ end }}
                 {{ if $inv.SellerAddress }}<p style="color:var(--text-muted)">{{ $inv.SellerAddress }}</p>{{ end }}
             </div>
-            {{ end }}
             <div>
-                <p class="section-title">Bill To</p>
+                <p style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:0.5rem">Bill To</p>
                 <p style="font-weight:600">{{ $inv.CustomerName }}</p>
                 {{ if $inv.CustomerMobile }}<p style="color:var(--text-muted)">{{ $inv.CustomerMobile }}</p>{{ end }}
                 {{ if $inv.CustomerEmail }}<p style="color:var(--text-muted)">{{ $inv.CustomerEmail }}</p>{{ end }}
-                {{ if $inv.CustomerAddress }}<p style="color:var(--text-muted)">{{ $inv.CustomerAddress }}</p>{{ end }}
+                {{ if $inv.CustomerAddressLine1 }}<p style="color:var(--text-muted)">{{ $inv.CustomerAddressLine1 }}</p>{{ end }}
+                {{ if $inv.CustomerAddressLine2 }}<p style="color:var(--text-muted)">{{ $inv.CustomerAddressLine2 }}</p>{{ end }}
             </div>
         </div>
     </div>

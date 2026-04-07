@@ -20,11 +20,13 @@ func CreateInvoice(inv models.Invoice, items []models.InvoiceItem, payment model
 
 	res, err := tx.NamedExec(`
 		INSERT INTO invoices
-			(invoice_number, customer_mobile, customer_name, customer_email, customer_address,
-			 seller_name, seller_address, date, payment_due, total_amount, status)
+			(invoice_number, customer_mobile, customer_name, customer_email,
+			 customer_address_line1, customer_address_line2,
+			 seller_name, seller_phone, seller_address, date, payment_due, total_amount, status)
 		VALUES
-			(:invoice_number, :customer_mobile, :customer_name, :customer_email, :customer_address,
-			 :seller_name, :seller_address, :date, :payment_due, :total_amount, :status)
+			(:invoice_number, :customer_mobile, :customer_name, :customer_email,
+			 :customer_address_line1, :customer_address_line2,
+			 :seller_name, :seller_phone, :seller_address, :date, :payment_due, :total_amount, :status)
 	`, inv)
 	if err != nil {
 		return 0, err
