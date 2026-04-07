@@ -95,12 +95,31 @@ This starts MySQL 8.0 and the app together. The migration in `migrations/001_ini
 | `MYSQL_DSN` | `root:root@tcp(127.0.0.1:3306)/invoice?parseTime=true` | MySQL connection string |
 | `PORT` | `8080` | HTTP server port |
 
-## Deployment
+## DEMO
 
-The app auto-deploys to [Render](https://render.com) on every push to `main` via the deploy hook in `.github/workflows/render-deploy.yml`.
+Demo Link : https://invoice-generator-2rzm.onrender.com/
 
-Set the following secret in your GitHub repository:
+<p align="center">
+  <h3>Create Invoice View</h3>
+  <img width="600" alt="Create Invoice View" src="https://github.com/user-attachments/assets/9279d17c-faf6-4efb-8f0c-a5fe50dabb71" />
+</p>
 
-| Secret | Description |
-|--------|-------------|
-| `RENDER_DEPLOY_HOOK_URL` | Render deploy hook URL (from service Settings) |
+<p align="center">
+  <h3>Create Customer View</h3>
+  <img width="600" height="880" alt="Create Customer View" src="https://github.com/user-attachments/assets/8a556506-0b64-42d4-892e-eb76a006cbfe" />
+</p>
+
+<p align="center">
+  <h3>Preview Created Invoice</h3>
+  <img width="600" height="958" alt="Preview Created Invoice" src="https://github.com/user-attachments/assets/c4333fef-b4b1-4249-89d1-3afdcf64bced" />
+</p>
+
+<p align="center">
+  <h3>Downloaded Invoice PDF</h3>
+  <img width="600" height="899" alt="Invoice" src="https://github.com/user-attachments/assets/c9f19b5d-e479-4d47-9773-1aab135545d7" />
+</p>
+
+
+
+
+
