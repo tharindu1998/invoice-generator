@@ -1,0 +1,132 @@
+{{ define "title" }}New Invoice — InvoiceGen{{ end }}
+
+{{ define "content" }}
+<div class="card">
+    <div class="card-header">
+        <h2>New Invoice</h2>
+        <p>Fill in the details below to generate an invoice.</p>
+    </div>
+
+    <form id="invoiceForm" method="POST" action="/invoice/generate">
+
+        <!-- Customer -->
+        <div class="form-section">
+            <p class="section-title">Customer</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="customer_mobile">Mobile Number *</label>
+                    <input type="text" id="customer_mobile" name="customer_mobile" required
+                           placeholder="e.g. 0771234567" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="customer_name">Full Name *</label>
+                    <input type="text" id="customer_name" name="customer_name" required
+                           placeholder="Customer name">
+                </div>
+                <div class="form-group">
+                    <label for="customer_email">Email</label>
+                    <input type="email" id="customer_email" name="customer_email"
+                           placeholder="customer@email.com">
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Details -->
+        <div class="form-section">
+            <p class="section-title">Invoice Details</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="date">Invoice Date *</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="due_date">Payment Due *</label>
+                    <input type="date" id="due_date" name="due_date" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items -->
+        <div class="form-section">
+            <p class="section-title">Items</p>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width:40%">Description</th>
+                        <th style="width:15%">Qty</th>
+                        <th style="width:20%">Unit Price</th>
+                        <th style="width:20%">Amount</th>
+                        <th style="width:5%"></th>
+                    </tr>
+                </thead>
+                <tbody id="items-container">
+                    <tr class="item-row">
+                        <td><input type="text"   name="item_name[]"     required placeholder="Item description"></td>
+                        <td><input type="number" name="item_quantity[]" required min="1" value="1"></td>
+                        <td><input type="number" name="item_price[]"    required min="0" step="0.01" placeholder="0.00"></td>
+                        <td><input type="text"   name="item_amount[]"   readonly class="amount-display" placeholder="0.00"></td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeItem(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-add-item" onclick="addItem()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Add Item
+            </button>
+            <div class="totals-row">
+                <div class="total-box">
+                    <span class="total-label">Total</span>
+                    <span class="total-amount" id="grand-total">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="form-section">
+            <p class="section-title">Payment Information</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="bank_name">Bank Name</label>
+                    <input type="text" id="bank_name" name="bank_name" placeholder="e.g. Commercial Bank">
+                </div>
+                <div class="form-group">
+                    <label for="bank_acc_no">Account Number</label>
+                    <input type="text" id="bank_acc_no" name="bank_acc_no" placeholder="Account number">
+                </div>
+                <div class="form-group">
+                    <label for="bank_branch">Branch</label>
+                    <input type="text" id="bank_branch" name="bank_branch" placeholder="Branch name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" rows="3" placeholder="Any additional notes..."></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="previewInvoice()">Preview</button>
+            <button type="submit" class="btn btn-primary">Generate Invoice</button>
+        </div>
+    </form>
+</div>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Invoice Preview</h3>
+            <button class="btn-close" id="closeModal">&times;</button>
+        </div>
+        <div id="previewContent"></div>
+    </div>
+</div>
+{{ end }}

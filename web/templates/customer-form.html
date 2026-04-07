@@ -1,0 +1,90 @@
+{{ define "title" }}Customers — InvoiceGen{{ end }}
+
+{{ define "content" }}
+<div style="display:flex;flex-direction:column;gap:1.5rem">
+
+    <!-- Save form -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Add Customer</h2>
+            <p>Saved customers are auto-filled by phone number when creating an invoice.</p>
+        </div>
+
+        <form method="POST" action="/customers/save">
+            <div class="form-section">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Mobile Number *</label>
+                        <input type="text" id="phone" name="phone" required
+                               placeholder="e.g. 0771234567" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" name="name" required placeholder="Full name">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="customer@email.com">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="address_line1">Address Line 1</label>
+                        <input type="text" id="address_line1" name="address_line1" placeholder="Street address">
+                    </div>
+                    <div class="form-group">
+                        <label for="address_line2">Address Line 2</label>
+                        <input type="text" id="address_line2" name="address_line2" placeholder="City, Province">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Customer</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Customer list -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Saved Customers</h2>
+            <p>{{ if .Data }}{{ len .Data }} customer{{ if gt (len .Data) 1 }}s{{ end }} saved{{ else }}No customers yet{{ end }}</p>
+        </div>
+
+        {{ if .Data }}
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Data }}
+                <tr class="item-row">
+                    <td>{{ .Name }}</td>
+                    <td>{{ .Phone }}</td>
+                    <td>{{ if .Email }}{{ .Email }}{{ else }}—{{ end }}</td>
+                    <td>{{ if .AddressLine1 }}{{ .AddressLine1 }}{{ if .AddressLine2 }}, {{ .AddressLine2 }}{{ end }}{{ else }}—{{ end }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+        {{ else }}
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+            </svg>
+            <p>No customers saved yet.</p>
+        </div>
+        {{ end }}
+    </div>
+
+</div>
+{{ end }}

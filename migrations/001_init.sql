@@ -11,13 +11,13 @@ CREATE TABLE customers (
   email VARCHAR(255),
   address_line1 TEXT,
   address_line2 TEXT,
-  phone VARCHAR(50),
+  phone VARCHAR(50) UNIQUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE invoices (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  invoice_number VARCHAR(100) NOT NULL,
+  invoice_number VARCHAR(100) NOT NULL UNIQUE,
   customer_mobile VARCHAR(50),
   customer_name VARCHAR(255),
   customer_email VARCHAR(255),
@@ -31,13 +31,11 @@ CREATE TABLE invoices (
 CREATE TABLE invoice_items (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   invoice_id BIGINT NOT NULL,
-  product_id BIGINT NOT NULL,
   name VARCHAR(255) NOT NULL,
   quantity INT NOT NULL,
   price DECIMAL(12,2) NOT NULL,
   amount DECIMAL(12,2) NOT NULL,
-  FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
-  FOREIGN KEY (product_id) REFERENCES products(id)
+  FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
 );
 
 CREATE TABLE payment_info (

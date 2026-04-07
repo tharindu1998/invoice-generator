@@ -1,0 +1,57 @@
+{{ define "title" }}Invoices — InvoiceGen{{ end }}
+
+{{ define "content" }}
+<div class="card">
+    <div class="card-header">
+        <h2>Invoices</h2>
+        <p>{{ if .Data }}{{ len .Data }} invoice{{ if gt (len .Data) 1 }}s{{ end }}{{ else }}No invoices yet{{ end }}</p>
+    </div>
+
+    {{ if .Data }}
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Invoice #</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Date</th>
+                <th>Due</th>
+                <th style="text-align:right">Amount</th>
+                <th style="text-align:center">Status</th>
+                <th style="text-align:center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Data }}
+            <tr class="item-row">
+                <td><strong>{{ .InvoiceNumber }}</strong></td>
+                <td>{{ .CustomerName }}</td>
+                <td>{{ .CustomerMobile }}</td>
+                <td>{{ .Date.Format "02 Jan 2006" }}</td>
+                <td>{{ .PaymentDue.Format "02 Jan 2006" }}</td>
+                <td style="text-align:right;font-weight:600">{{ printf "%.2f" .TotalAmount }}</td>
+                <td style="text-align:center">
+                    <span class="badge {{ if eq .Status "paid" }}badge-paid{{ else if eq .Status "draft" }}badge-draft{{ else }}badge-pending{{ end }}">
+                        {{ .Status }}
+                    </span>
+                </td>
+                <td style="text-align:center">
+                    <a href="/invoice/{{ .ID }}" class="btn btn-secondary btn-sm">View</a>
+                    <a href="/invoice/{{ .ID }}/pdf" class="btn btn-primary btn-sm">PDF</a>
+                </td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+    {{ else }}
+    <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        <p>No invoices generated yet.</p>
+        <a href="/" class="btn btn-primary">Create First Invoice</a>
+    </div>
+    {{ end }}
+</div>
+{{ end }}

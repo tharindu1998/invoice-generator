@@ -1,0 +1,111 @@
+{{ define "title" }}{{ .Data.InvoiceNumber }} — InvoiceGen{{ end }}
+
+{{ define "content" }}
+{{ $inv := .Data }}
+<div class="card">
+    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+            <h2>{{ $inv.InvoiceNumber }}</h2>
+            <p>{{ $inv.Date.Format "02 Jan 2006" }} &nbsp;·&nbsp; Due {{ $inv.PaymentDue.Format "02 Jan 2006" }}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+            <span class="badge {{ if eq $inv.Status "paid" }}badge-paid{{ else if eq $inv.Status "draft" }}badge-draft{{ else }}badge-pending{{ end }}" style="font-size:0.85rem;padding:0.3rem 0.9rem">
+                {{ $inv.Status }}
+            </span>
+            <a href="/invoice/{{ $inv.ID }}/pdf" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download PDF
+            </a>
+            <a href="/invoices" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+
+    <!-- Customer -->
+    <div class="form-section">
+        <p class="section-title">Customer</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+            <div>
+                <p style="font-size:0.8rem;color:var(--text-muted)">Name</p>
+                <p style="font-weight:600">{{ $inv.CustomerName }}</p>
+            </div>
+            <div>
+                <p style="font-size:0.8rem;color:var(--text-muted)">Phone</p>
+                <p style="font-weight:600">{{ $inv.CustomerMobile }}</p>
+            </div>
+            {{ if $inv.CustomerEmail }}
+            <div>
+                <p style="font-size:0.8rem;color:var(--text-muted)">Email</p>
+                <p style="font-weight:600">{{ $inv.CustomerEmail }}</p>
+            </div>
+            {{ end }}
+        </div>
+    </div>
+
+    <!-- Items -->
+    <div class="form-section">
+        <p class="section-title">Items</p>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th style="text-align:center">Qty</th>
+                    <th style="text-align:right">Unit Price</th>
+                    <th style="text-align:right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range $inv.Items }}
+                <tr class="item-row">
+                    <td>{{ .Name }}</td>
+                    <td style="text-align:center">{{ .Quantity }}</td>
+                    <td style="text-align:right">{{ printf "%.2f" .Price }}</td>
+                    <td style="text-align:right">{{ printf "%.2f" .Amount }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="padding:0.75rem;text-align:right;font-weight:700;border-top:2px solid var(--border)">Total</td>
+                    <td style="padding:0.75rem;text-align:right;font-weight:700;font-size:1.1rem;color:var(--primary);border-top:2px solid var(--border)">{{ printf "%.2f" $inv.TotalAmount }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- Payment -->
+    {{ if $inv.Payment }}
+    {{ $p := $inv.Payment }}
+    <div class="form-section">
+        <p class="section-title">Payment Details</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+            {{ if $p.BankName }}
+            <div>
+                <p style="font-size:0.8rem;color:var(--text-muted)">Bank</p>
+                <p style="font-weight:600">{{ $p.BankName }}</p>
+            </div>
+            {{ end }}
+            {{ if $p.BankAccNo }}
+            <div>
+                <p style="font-size:0.8rem;color:var(--text-muted)">Account No.</p>
+                <p style="font-weight:600">{{ $p.BankAccNo }}</p>
+            </div>
+            {{ end }}
+            {{ if $p.BankBranch }}
+            <div>
+                <p style="font-size:0.8rem;color:var(--text-muted)">Branch</p>
+                <p style="font-weight:600">{{ $p.BankBranch }}</p>
+            </div>
+            {{ end }}
+        </div>
+        {{ if $p.Notes }}
+        <p style="margin-top:0.75rem;color:var(--text-muted);font-size:0.9rem">{{ $p.Notes }}</p>
+        {{ end }}
+    </div>
+    {{ end }}
+
+</div>
+{{ end }}
