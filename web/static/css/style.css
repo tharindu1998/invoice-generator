@@ -202,6 +202,39 @@ body {
     color: #c4c9d4;
 }
 
+.phone-error {
+    font-size: 0.78rem;
+    color: var(--danger);
+    margin-top: 0.3rem;
+    display: none;
+}
+
+.phone-error.visible {
+    display: block;
+}
+
+.form-group .iti {
+    width: 100%;
+}
+
+.form-group .iti__tel-input {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    border: 1.5px solid var(--iti-border-color, var(--border));
+    border-radius: 7px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-group .iti__tel-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+}
+
 /* ── Invoice items table ────────────────────────────── */
 .items-table {
     width: 100%;
@@ -318,7 +351,6 @@ body {
     background: transparent;
     color: var(--danger);
     border: 1.5px solid #fecaca;
-    padding: 0.45rem 0.7rem;
 }
 
 .btn-danger:hover {

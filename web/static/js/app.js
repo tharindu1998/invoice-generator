@@ -12,17 +12,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // Amount calculation for initial row
     attachRowListeners(document.querySelector('.item-row'));
 
-    // Phone lookup: auto-fill customer name & email
-    const phoneEl = document.getElementById('customer_mobile');
-    if (phoneEl) {
-        let debounceTimer;
-        phoneEl.addEventListener('input', function () {
-            clearTimeout(debounceTimer);
-            const phone = this.value.trim();
-            if (phone.length < 7) return;
-            debounceTimer = setTimeout(() => lookupCustomer(phone), 400);
+    // Phone validation
+    initPhoneValidation('phone', 'phone_error');
+    initPhoneValidation('customer_mobile', 'customer_mobile_error', true);
+
+    // Form submit validation
+    ['invoiceForm', 'customerForm'].forEach(function(id) {
+        const form = document.getElementById(id);
+        if (form) form.addEventListener('submit', function(e) {
+            if (!validatePhone('phone', 'phone_error') | !validatePhone('customer_mobile', 'customer_mobile_error')) {
+                e.preventDefault();
+            }
         });
-    }
+    });
 
     // Modal close
     const closeBtn = document.getElementById('closeModal');
@@ -33,6 +35,45 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.target === modal) closeModal();
     });
 });
+
+function initPhoneValidation(inputId, errorId, doLookup) {
+    const inputEl = document.getElementById(inputId);
+    if (!inputEl) return;
+
+    let debounceTimer;
+    inputEl.addEventListener('input', function () {
+        // digits only
+        this.value = this.value.replace(/\D/g, '');
+        validatePhone(inputId, errorId);
+
+        if (doLookup) {
+            clearTimeout(debounceTimer);
+            if (this.value.length >= 7) {
+                debounceTimer = setTimeout(() => lookupCustomer(this.value), 400);
+            }
+        }
+    });
+}
+
+function validatePhone(inputId, errorId) {
+    const inputEl = document.getElementById(inputId);
+    const errorEl = document.getElementById(errorId);
+    if (!inputEl || !errorEl) return true;
+
+    const val = inputEl.value.trim();
+    if (!val) return true; // empty is handled by required attr
+
+    if (val.length < 7 || val.length > 15) {
+        errorEl.textContent = `Phone number must be between 7 and 15 digits (got ${val.length}).`;
+        errorEl.classList.add('visible');
+        inputEl.style.borderColor = 'var(--danger)';
+        return false;
+    }
+
+    errorEl.classList.remove('visible');
+    inputEl.style.borderColor = '';
+    return true;
+}
 
 function lookupCustomer(phone) {
     fetch(`/api/customer?phone=${encodeURIComponent(phone)}`)

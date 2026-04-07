@@ -35,12 +35,14 @@
                         {{ .Status }}
                     </span>
                 </td>
-                <td style="text-align:center">
-                    <a href="/invoice/{{ .ID }}" class="btn btn-secondary btn-sm">View</a>
-                    <a href="/invoice/{{ .ID }}/pdf" class="btn btn-primary btn-sm">PDF</a>
-                    <form method="POST" action="/invoice/{{ .ID }}/delete" style="display:inline" onsubmit="return confirm('Delete invoice {{ .InvoiceNumber }}?')">
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
+                <td>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:0.4rem;flex-wrap:nowrap">
+                        <a href="/invoice/{{ .ID }}" class="btn btn-secondary btn-sm">View</a>
+                        <a href="/invoice/{{ .ID }}/pdf" class="btn btn-primary btn-sm">PDF</a>
+                        <form method="POST" action="/invoice/{{ .ID }}/delete" onsubmit="return confirm('Delete invoice {{ .InvoiceNumber }}?')">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             {{ end }}
