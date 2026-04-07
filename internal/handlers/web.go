@@ -186,12 +186,15 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	inv := models.Invoice{
-		CustomerMobile: r.FormValue("customer_mobile"),
-		CustomerName:   r.FormValue("customer_name"),
-		CustomerEmail:  r.FormValue("customer_email"),
-		Date:           date,
-		PaymentDue:     dueDate,
-		TotalAmount:    total,
+		CustomerMobile:  r.FormValue("customer_mobile"),
+		CustomerName:    r.FormValue("customer_name"),
+		CustomerEmail:   r.FormValue("customer_email"),
+		CustomerAddress: r.FormValue("customer_address"),
+		SellerName:      r.FormValue("seller_name"),
+		SellerAddress:   r.FormValue("seller_address"),
+		Date:            date,
+		PaymentDue:      dueDate,
+		TotalAmount:     total,
 	}
 
 	payment := models.PaymentInfo{

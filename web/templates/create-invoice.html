@@ -9,6 +9,21 @@
 
     <form id="invoiceForm" method="POST" action="/invoice/generate">
 
+        <!-- Seller -->
+        <div class="form-section">
+            <p class="section-title">Seller</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="seller_name">Seller / Company Name</label>
+                    <input type="text" id="seller_name" name="seller_name" placeholder="Your name or company">
+                </div>
+                <div class="form-group">
+                    <label for="seller_address">Seller Address</label>
+                    <input type="text" id="seller_address" name="seller_address" placeholder="Street, City, Country">
+                </div>
+            </div>
+        </div>
+
         <!-- Customer -->
         <div class="form-section">
             <p class="section-title">Customer</p>
@@ -28,6 +43,12 @@
                     <label for="customer_email">Email</label>
                     <input type="email" id="customer_email" name="customer_email"
                            placeholder="customer@email.com">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="customer_address">Customer Address</label>
+                    <input type="text" id="customer_address" name="customer_address" placeholder="Street, City, Country">
                 </div>
             </div>
         </div>

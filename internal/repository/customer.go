@@ -17,8 +17,8 @@ func SaveCustomer(c models.Customer) error {
 		ON DUPLICATE KEY UPDATE
 			name          = VALUES(name),
 			email         = VALUES(email),
-			address_line1 = VALUES(address_line1),
-			address_line2 = VALUES(address_line2)
+			address_line1 = IF(VALUES(address_line1) != '', VALUES(address_line1), address_line1),
+			address_line2 = IF(VALUES(address_line2) != '', VALUES(address_line2), address_line2)
 	`, c)
 	return err
 }

@@ -80,10 +80,15 @@ function lookupCustomer(phone) {
         .then(r => r.ok ? r.json() : null)
         .then(data => {
             if (!data) return;
-            const nameEl  = document.getElementById('customer_name');
-            const emailEl = document.getElementById('customer_email');
-            if (nameEl  && !nameEl.value)  nameEl.value  = data.name  || '';
-            if (emailEl && !emailEl.value) emailEl.value = data.email || '';
+            const nameEl    = document.getElementById('customer_name');
+            const emailEl   = document.getElementById('customer_email');
+            const addressEl = document.getElementById('customer_address');
+            if (nameEl    && !nameEl.value)    nameEl.value    = data.name  || '';
+            if (emailEl   && !emailEl.value)   emailEl.value   = data.email || '';
+            if (addressEl && !addressEl.value) {
+                const parts = [data.address_line1, data.address_line2].filter(Boolean);
+                addressEl.value = parts.join(', ');
+            }
         })
         .catch(() => {});
 }

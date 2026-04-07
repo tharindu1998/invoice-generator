@@ -24,24 +24,23 @@
         </div>
     </div>
 
-    <!-- Customer -->
+    <!-- Addresses -->
     <div class="form-section">
-        <p class="section-title">Customer</p>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+            {{ if or $inv.SellerName $inv.SellerAddress }}
             <div>
-                <p style="font-size:0.8rem;color:var(--text-muted)">Name</p>
-                <p style="font-weight:600">{{ $inv.CustomerName }}</p>
-            </div>
-            <div>
-                <p style="font-size:0.8rem;color:var(--text-muted)">Phone</p>
-                <p style="font-weight:600">{{ $inv.CustomerMobile }}</p>
-            </div>
-            {{ if $inv.CustomerEmail }}
-            <div>
-                <p style="font-size:0.8rem;color:var(--text-muted)">Email</p>
-                <p style="font-weight:600">{{ $inv.CustomerEmail }}</p>
+                <p class="section-title">From</p>
+                {{ if $inv.SellerName }}<p style="font-weight:600">{{ $inv.SellerName }}</p>{{ end }}
+                {{ if $inv.SellerAddress }}<p style="color:var(--text-muted)">{{ $inv.SellerAddress }}</p>{{ end }}
             </div>
             {{ end }}
+            <div>
+                <p class="section-title">Bill To</p>
+                <p style="font-weight:600">{{ $inv.CustomerName }}</p>
+                {{ if $inv.CustomerMobile }}<p style="color:var(--text-muted)">{{ $inv.CustomerMobile }}</p>{{ end }}
+                {{ if $inv.CustomerEmail }}<p style="color:var(--text-muted)">{{ $inv.CustomerEmail }}</p>{{ end }}
+                {{ if $inv.CustomerAddress }}<p style="color:var(--text-muted)">{{ $inv.CustomerAddress }}</p>{{ end }}
+            </div>
         </div>
     </div>
 

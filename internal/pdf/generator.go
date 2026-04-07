@@ -37,33 +37,53 @@ func GenerateInvoice(inv models.Invoice) (*fpdf.Fpdf, error) {
 	pdf.SetXY(marginL+contentW/2, 14)
 	pdf.CellFormat(contentW/2, 6, fmt.Sprintf("Date: %s", inv.Date.Format("02 Jan 2006")), "", 0, "R", false, 0, "")
 
-	// ── Customer info ────────────────────────────────────
-	pdf.SetTextColor(30, 30, 30)
+	// ── Seller (left) & Customer (right) ────────────────
 	pdf.SetXY(marginL, 36)
 
+	// Seller — left column
 	pdf.SetFont("Helvetica", "B", 8)
 	pdf.SetTextColor(100, 100, 120)
-	pdf.CellFormat(contentW/2, 5, "BILLED TO", "", 2, "L", false, 0, "")
-
-	pdf.SetFont("Helvetica", "B", 12)
-	pdf.SetTextColor(30, 30, 30)
-	pdf.CellFormat(contentW/2, 7, inv.CustomerName, "", 2, "L", false, 0, "")
-
-	pdf.SetFont("Helvetica", "", 10)
-	pdf.SetTextColor(80, 80, 90)
-	if inv.CustomerMobile != "" {
-		pdf.CellFormat(contentW/2, 5, inv.CustomerMobile, "", 2, "L", false, 0, "")
+	pdf.CellFormat(contentW/2, 5, "FROM", "", 2, "L", false, 0, "")
+	if inv.SellerName != "" {
+		pdf.SetFont("Helvetica", "B", 11)
+		pdf.SetTextColor(30, 30, 30)
+		pdf.CellFormat(contentW/2, 6, inv.SellerName, "", 2, "L", false, 0, "")
 	}
-	if inv.CustomerEmail != "" {
-		pdf.CellFormat(contentW/2, 5, inv.CustomerEmail, "", 2, "L", false, 0, "")
+	if inv.SellerAddress != "" {
+		pdf.SetFont("Helvetica", "", 9)
+		pdf.SetTextColor(80, 80, 90)
+		pdf.MultiCell(contentW/2, 5, inv.SellerAddress, "", "L", false)
 	}
 
-	// Due date — right side
+	// Customer — right column
 	pdf.SetXY(marginL+contentW/2, 36)
 	pdf.SetFont("Helvetica", "B", 8)
 	pdf.SetTextColor(100, 100, 120)
-	pdf.CellFormat(contentW/2, 5, "PAYMENT DUE", "", 2, "R", false, 0, "")
+	pdf.CellFormat(contentW/2, 5, "BILLED TO", "", 2, "R", false, 0, "")
+
 	pdf.SetXY(marginL+contentW/2, 41)
+	pdf.SetFont("Helvetica", "B", 11)
+	pdf.SetTextColor(30, 30, 30)
+	pdf.CellFormat(contentW/2, 6, inv.CustomerName, "", 2, "R", false, 0, "")
+
+	pdf.SetFont("Helvetica", "", 9)
+	pdf.SetTextColor(80, 80, 90)
+	if inv.CustomerMobile != "" {
+		pdf.CellFormat(contentW/2, 5, inv.CustomerMobile, "", 2, "R", false, 0, "")
+	}
+	if inv.CustomerEmail != "" {
+		pdf.CellFormat(contentW/2, 5, inv.CustomerEmail, "", 2, "R", false, 0, "")
+	}
+	if inv.CustomerAddress != "" {
+		pdf.CellFormat(contentW/2, 5, inv.CustomerAddress, "", 2, "R", false, 0, "")
+	}
+
+	// Due date — below right column
+	pdf.SetXY(marginL+contentW/2, pdf.GetY()+3)
+	pdf.SetFont("Helvetica", "B", 8)
+	pdf.SetTextColor(100, 100, 120)
+	pdf.CellFormat(contentW/2, 5, "PAYMENT DUE", "", 2, "R", false, 0, "")
+	pdf.SetXY(marginL+contentW/2, pdf.GetY())
 	pdf.SetFont("Helvetica", "B", 13)
 	pdf.SetTextColor(primaryR, primaryG, primaryB)
 	pdf.CellFormat(contentW/2, 7, inv.PaymentDue.Format("02 Jan 2006"), "", 0, "R", false, 0, "")
