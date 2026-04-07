@@ -129,6 +129,22 @@ func DeleteCustomer(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/customers", http.StatusSeeOther)
 }
 
+// ── Delete invoice ───────────────────────────────────
+
+func DeleteInvoice(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	if err := repository.DeleteInvoice(id); err != nil {
+		log.Printf("delete invoice: %v", err)
+		http.Error(w, "could not delete invoice", http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/invoices", http.StatusSeeOther)
+}
+
 // ── Generate invoice ─────────────────────────────────
 
 func GenerateInvoice(w http.ResponseWriter, r *http.Request) {

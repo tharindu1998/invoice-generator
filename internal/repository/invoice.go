@@ -85,6 +85,11 @@ func GetInvoice(id int64) (models.Invoice, error) {
 	return inv, nil
 }
 
+func DeleteInvoice(id int64) error {
+	_, err := db.DB.Exec("DELETE FROM invoices WHERE id = ?", id)
+	return err
+}
+
 func generateInvoiceNumber() string {
 	var count int
 	db.DB.Get(&count, "SELECT COUNT(*) FROM invoices WHERE DATE(created_at) = CURDATE()")
