@@ -1,14 +1,14 @@
 # InvoiceGen
 
-A simple invoice generator built with Go, MySQL, and plain HTML/CSS/JS. Create invoices, manage customers, and download PDF copies.
+A web-based invoice generator built with Go, MySQL, and plain HTML/CSS/JS. Create professional invoices, manage customers, and download PDF copies.
 
 ## Features
 
-- Create invoices with multiple line items
-- Auto-fill customer details by phone number
+- Create invoices with seller & customer details (name, address, phone)
+- Auto-fill customer details by phone number lookup
 - Save and manage customers
 - Generate and download invoices as PDF
-- View all generated invoices
+- View all generated invoices with delete support
 
 ## Tech Stack
 
@@ -17,6 +17,7 @@ A simple invoice generator built with Go, MySQL, and plain HTML/CSS/JS. Create i
 - **PDF** — `github.com/go-pdf/fpdf`
 - **Frontend** — HTML, CSS, Vanilla JS
 - **Infrastructure** — Docker Compose
+- **CI/CD** — GitHub Actions → Render deploy hook
 
 ## Project Structure
 
@@ -26,23 +27,32 @@ Invoice Generator/
 │   └── main.go                 # Entry point, HTTP server, routes
 ├── internal/
 │   ├── db/
-│   │   └── db.go               # MySQL connection
+│   │   └── db.go               # MySQL connection (reads MYSQL_DSN env)
 │   ├── handlers/
 │   │   └── web.go              # HTTP handlers
-│   ├── models/                 # Data models
+│   ├── models/                 # Data models (Invoice, Customer, PaymentInfo, etc.)
 │   ├── pdf/
 │   │   └── generator.go        # PDF generation
 │   └── repository/
 │       ├── customer.go         # Customer DB queries
 │       └── invoice.go          # Invoice DB queries
 ├── migrations/
-│   └── 001_init.sql            # Database schema
+│   └── 001_init.sql            # Full database schema (run once)
 ├── web/
 │   ├── static/
 │   │   ├── css/style.css
 │   │   ├── js/app.js
+│   │   ├── logo.svg
 │   │   └── favicon.svg
 │   └── templates/              # Go HTML templates
+│       ├── base.html
+│       ├── create-invoice.html
+│       ├── customer-form.html
+│       ├── invoice-preview.html
+│       └── invoices.html
+├── .github/
+│   └── workflows/
+│       └── render-deploy.yml   # Auto-deploy to Render on push to main
 ├── Dockerfile
 └── docker-compose.yml
 ```
@@ -51,30 +61,17 @@ Invoice Generator/
 
 ### Prerequisites
 
-- [Go 1.22+](https://go.dev/dl/)
 - [Docker](https://www.docker.com/)
 
-### 1. Start MySQL
-
-```bash
-docker compose up db -d
-```
-
-This starts MySQL 8.0 on port `3306` and auto-runs the migration.
-
-### 2. Run the server
-
-```bash
-go run ./cmd/main.go
-```
-
-Open [http://localhost:8080](http://localhost:8080)
-
-### Run with Docker (app + db)
+### Run with Docker
 
 ```bash
 docker compose up --build
 ```
+
+Open [http://localhost:8080](http://localhost:8080)
+
+This starts MySQL 8.0 and the app together. The migration in `migrations/001_init.sql` runs automatically on first start.
 
 ## Routes
 
@@ -84,9 +81,11 @@ docker compose up --build
 | `POST` | `/invoice/generate` | Save invoice and redirect to view |
 | `GET` | `/invoice/{id}` | View invoice |
 | `GET` | `/invoice/{id}/pdf` | Download invoice as PDF |
+| `POST` | `/invoice/{id}/delete` | Delete invoice |
 | `GET` | `/invoices` | List all invoices |
-| `GET` | `/customers` | Customer form + saved customers |
-| `POST` | `/customers/save` | Save a customer |
+| `GET` | `/customers` | Customer form + saved customers list |
+| `POST` | `/customers/save` | Save or update a customer |
+| `POST` | `/customers/{id}/delete` | Delete a customer |
 | `GET` | `/api/customer?phone=` | Lookup customer by phone (JSON) |
 
 ## Environment Variables
@@ -95,3 +94,13 @@ docker compose up --build
 |----------|---------|-------------|
 | `MYSQL_DSN` | `root:root@tcp(127.0.0.1:3306)/invoice?parseTime=true` | MySQL connection string |
 | `PORT` | `8080` | HTTP server port |
+
+## Deployment
+
+The app auto-deploys to [Render](https://render.com) on every push to `main` via the deploy hook in `.github/workflows/render-deploy.yml`.
+
+Set the following secret in your GitHub repository:
+
+| Secret | Description |
+|--------|-------------|
+| `RENDER_DEPLOY_HOOK_URL` | Render deploy hook URL (from service Settings) |
