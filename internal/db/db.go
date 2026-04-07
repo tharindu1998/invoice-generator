@@ -1,9 +1,10 @@
 package db
 
 import (
-	"github.com/jmoiron/sqlx"
-	_ "github.com/go-sql-driver/mysql"
 	"os"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
 var DB *sqlx.DB
