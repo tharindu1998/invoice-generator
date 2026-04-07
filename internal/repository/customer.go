@@ -29,6 +29,11 @@ func GetAllCustomers() ([]models.Customer, error) {
 	return customers, err
 }
 
+func DeleteCustomer(id int64) error {
+	_, err := db.DB.Exec("DELETE FROM customers WHERE id = ?", id)
+	return err
+}
+
 func GetCustomerByPhone(phone string) (models.Customer, error) {
 	var c models.Customer
 	err := db.DB.Get(&c, "SELECT * FROM customers WHERE phone = ? LIMIT 1", phone)

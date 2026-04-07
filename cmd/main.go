@@ -28,6 +28,7 @@ func main() {
 
 	// Actions
 	http.HandleFunc("POST /customers/save", handlers.SaveCustomer)
+	http.HandleFunc("POST /customers/{id}/delete", handlers.DeleteCustomer)
 	http.HandleFunc("POST /invoice/generate", handlers.GenerateInvoice)
 
 	// API
