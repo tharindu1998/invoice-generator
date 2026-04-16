@@ -10,6 +10,7 @@ import (
 
 var ErrNotFound = errors.New("not found")
 
+// SaveCustomer inserts or updates a customer, using phone as unique key
 func SaveCustomer(c models.Customer) error {
 	_, err := db.DB.NamedExec(`
 		INSERT INTO customers (name, email, address_line1, address_line2, phone)
@@ -23,17 +24,20 @@ func SaveCustomer(c models.Customer) error {
 	return err
 }
 
+// GetAllCustomers retrieves all customers ordered by most recent first
 func GetAllCustomers() ([]models.Customer, error) {
 	var customers []models.Customer
 	err := db.DB.Select(&customers, "SELECT * FROM customers ORDER BY created_at DESC")
 	return customers, err
 }
 
+// DeleteCustomer removes a customer from the database
 func DeleteCustomer(id int64) error {
 	_, err := db.DB.Exec("DELETE FROM customers WHERE id = ?", id)
 	return err
 }
 
+// GetCustomerByPhone looks up a customer by their phone number
 func GetCustomerByPhone(phone string) (models.Customer, error) {
 	var c models.Customer
 	err := db.DB.Get(&c, "SELECT * FROM customers WHERE phone = ? LIMIT 1", phone)

@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
 	"time"
 
+	"invoice-generator/internal/logger"
 	"invoice-generator/internal/models"
 	"invoice-generator/internal/pdf"
 	"invoice-generator/internal/repository"
@@ -29,12 +29,12 @@ func render(w http.ResponseWriter, page string, data PageData) {
 		filepath.Join("web", "templates", page),
 	)
 	if err != nil {
-		log.Printf("template parse error: %v", err)
+		logger.Log.Error("template parse error", "err", err)
 		http.Error(w, "template error", http.StatusInternalServerError)
 		return
 	}
 	if err := tmpl.ExecuteTemplate(w, "base", data); err != nil {
-		log.Printf("template execute error: %v", err)
+		logger.Log.Error("template execute error", "err", err)
 	}
 }
 
@@ -53,7 +53,7 @@ func CreateInvoice(w http.ResponseWriter, r *http.Request) {
 func Customers(w http.ResponseWriter, r *http.Request) {
 	customers, err := repository.GetAllCustomers()
 	if err != nil {
-		log.Printf("get customers: %v", err)
+		logger.Log.Error("get customers", "err", err)
 		customers = nil
 	}
 	render(w, "customer-form.html", PageData{Page: "customers", Data: customers})
@@ -74,7 +74,7 @@ func LookupCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		log.Printf("lookup customer: %v", err)
+		logger.Log.Error("lookup customer", "err", err)
 		jsonError(w, "server error", http.StatusInternalServerError)
 		return
 	}
@@ -87,6 +87,7 @@ func LookupCustomer(w http.ResponseWriter, r *http.Request) {
 
 func SaveCustomer(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
+		logger.Log.Error("parse form", "err", err)
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
@@ -105,7 +106,7 @@ func SaveCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := repository.SaveCustomer(c); err != nil {
-		log.Printf("save customer: %v", err)
+		logger.Log.Error("save customer", "err", err)
 		http.Error(w, "could not save customer", http.StatusInternalServerError)
 		return
 	}
@@ -122,7 +123,7 @@ func DeleteCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := repository.DeleteCustomer(id); err != nil {
-		log.Printf("delete customer: %v", err)
+		logger.Log.Error("delete customer", "err", err)
 		http.Error(w, "could not delete customer", http.StatusInternalServerError)
 		return
 	}
@@ -138,7 +139,7 @@ func DeleteInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := repository.DeleteInvoice(id); err != nil {
-		log.Printf("delete invoice: %v", err)
+		logger.Log.Error("delete invoice", "err", err)
 		http.Error(w, "could not delete invoice", http.StatusInternalServerError)
 		return
 	}
@@ -149,6 +150,7 @@ func DeleteInvoice(w http.ResponseWriter, r *http.Request) {
 
 func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
+		logger.Log.Error("parse form", "err", err)
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
@@ -172,8 +174,18 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 	var total float64
 
 	for i := range names {
-		qty, _ := strconv.Atoi(quantities[i])
-		price, _ := strconv.ParseFloat(prices[i], 64)
+		qty, err := strconv.Atoi(quantities[i])
+		if err != nil {
+			logger.Log.Error("parse quantity", "err", err)
+			http.Error(w, "invalid quantity", http.StatusBadRequest)
+			return
+		}
+		price, err := strconv.ParseFloat(prices[i], 64)
+		if err != nil {
+			logger.Log.Error("parse price", "err", err)
+			http.Error(w, "invalid price", http.StatusBadRequest)
+			return
+		}
 		amount := float64(qty) * price
 		total += amount
 
@@ -209,18 +221,20 @@ func GenerateInvoice(w http.ResponseWriter, r *http.Request) {
 
 	// Auto-save customer by phone if name provided
 	if inv.CustomerMobile != "" && inv.CustomerName != "" {
-		_ = repository.SaveCustomer(models.Customer{
+		if err := repository.SaveCustomer(models.Customer{
 			Phone:        inv.CustomerMobile,
 			Name:         inv.CustomerName,
 			Email:        inv.CustomerEmail,
 			AddressLine1: inv.CustomerAddressLine1,
 			AddressLine2: inv.CustomerAddressLine2,
-		})
+		}); err != nil {
+			logger.Log.Error("auto-save customer", "err", err)
+		}
 	}
 
 	id, err := repository.CreateInvoice(inv, items, payment)
 	if err != nil {
-		log.Printf("create invoice: %v", err)
+		logger.Log.Error("create invoice", "err", err)
 		http.Error(w, "could not save invoice", http.StatusInternalServerError)
 		return
 	}
@@ -240,7 +254,7 @@ func ViewInvoice(w http.ResponseWriter, r *http.Request) {
 
 	inv, err := repository.GetInvoice(id)
 	if err != nil {
-		log.Printf("get invoice: %v", err)
+		logger.Log.Error("get invoice", "err", err)
 		http.NotFound(w, r)
 		return
 	}
@@ -253,7 +267,7 @@ func ViewInvoice(w http.ResponseWriter, r *http.Request) {
 func Invoices(w http.ResponseWriter, r *http.Request) {
 	invoices, err := repository.GetAllInvoices()
 	if err != nil {
-		log.Printf("get invoices: %v", err)
+		logger.Log.Error("get invoices", "err", err)
 		invoices = nil
 	}
 	render(w, "invoices.html", PageData{Page: "invoices", Data: invoices})
@@ -271,14 +285,14 @@ func DownloadPDF(w http.ResponseWriter, r *http.Request) {
 
 	inv, err := repository.GetInvoice(id)
 	if err != nil {
-		log.Printf("get invoice for pdf: %v", err)
+		logger.Log.Error("get invoice for pdf", "err", err)
 		http.NotFound(w, r)
 		return
 	}
 
 	doc, err := pdf.GenerateInvoice(inv)
 	if err != nil {
-		log.Printf("generate pdf: %v", err)
+		logger.Log.Error("generate pdf", "err", err)
 		http.Error(w, "could not generate PDF", http.StatusInternalServerError)
 		return
 	}
@@ -286,6 +300,6 @@ func DownloadPDF(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/pdf")
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s.pdf"`, inv.InvoiceNumber))
 	if err := doc.Output(w); err != nil {
-		log.Printf("pdf output: %v", err)
+		logger.Log.Error("pdf output", "err", err)
 	}
 }

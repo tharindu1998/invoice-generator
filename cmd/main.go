@@ -1,19 +1,20 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"os"
 
 	"invoice-generator/internal/db"
 	"invoice-generator/internal/handlers"
+	"invoice-generator/internal/logger"
 )
 
 func main() {
 	if _, err := db.InitDB(); err != nil {
-		log.Fatalf("database connection failed: %v", err)
+		logger.Log.Error("database connection failed", "err", err)
+		os.Exit(1)
 	}
-	log.Println("database connected")
+	logger.Log.Info("database connected")
 
 	// Static files
 	fs := http.FileServer(http.Dir("web/static"))
@@ -40,6 +41,9 @@ func main() {
 		port = "8080"
 	}
 
-	log.Printf("server running → http://localhost:%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	logger.Log.Info("server running", "port", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		logger.Log.Error("server error", "err", err)
+		os.Exit(1)
+	}
 }
